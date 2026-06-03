@@ -1,3 +1,4 @@
+// src\lib\bot.js
 const STATUS_MESSAGES = {
   pending: { icon: "⏳", label: "در انتظار تایید" },
   confirmed: { icon: "✅", label: "تایید شده" },

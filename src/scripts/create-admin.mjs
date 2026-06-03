@@ -1,3 +1,4 @@
+// src\scripts\create-admin.mjs
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
