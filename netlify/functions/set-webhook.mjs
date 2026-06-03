@@ -10,7 +10,7 @@ export async function handler(event, context) {
     };
   }
 
-  const WEBHOOK_URL = `${DOMAIN}/api/webhook`;
+  const WEBHOOK_URL = `${DOMAIN}/api/telegram`;
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook`;
 
   try {
