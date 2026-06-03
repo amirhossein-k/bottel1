@@ -1,6 +1,6 @@
 // // app\telegram\handlers\start.js
 
-import { connectDB } from "@/app/lib/mongodb";
+// import { connectDB } from "@/app/lib/mongodb";
 const MESSAGES = {
   welcome: `سلام! 👋\n\nبه ربات پیگیری سفارش خوش اومدی.\n\n📦 برای پیگیری سفارشت، <b>کد سفارش</b> خودت رو ارسال کن.\n\nمثال: <code>1001</code>`,
   notFound: `❌ سفارشی با این کد پیدا نشد.\n\nلطفاً کد سفارش رو از پیام تأیید خریدت کپی کن.\nدر صورت مشکل با پشتیبانی تماس بگیر. 📞`,
@@ -8,7 +8,7 @@ const MESSAGES = {
 };
 export function startHandler() {
   return async (ctx) => {
-    await connectDB();
+    // await connectDB();
     // const msg = ctx.message;
     //     if (!msg || !msg.text) return;
 
