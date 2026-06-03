@@ -1,26 +1,48 @@
+// src\app\api\mongodb.ts
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI در فایل .env تنظیم نشده");
-}
-
-// کش اتصال برای جلوگیری از اتصال مکرر در Next.js
 let cached = global.mongoose;
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
-
-export async function connectDB() {
+export async function dbConnect() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "trackbot",
+      bufferCommands: false, // مهم: بافر را غیرفعال می‌کند تا فوراً خطا بدهد
     });
   }
 
   cached.conn = await cached.promise;
   return cached.conn;
 }
+
+// import mongoose from "mongoose";
+
+// const MONGODB_URI = process.env.MONGODB_URI;
+
+// if (!MONGODB_URI) {
+//   throw new Error("MONGODB_URI در فایل .env تنظیم نشده");
+// }
+
+// // کش اتصال برای جلوگیری از اتصال مکرر در Next.js
+// let cached = global.mongoose;
+// if (!cached) {
+//   cached = global.mongoose = { conn: null, promise: null };
+// }
+
+// export async function connectDB() {
+//   if (cached.conn) return cached.conn;
+
+//   if (!cached.promise) {
+//     cached.promise = mongoose.connect(MONGODB_URI, {
+//       dbName: "trackbot",
+//     });
+//   }
+
+//   cached.conn = await cached.promise;
+//   return cached.conn;
+// }
