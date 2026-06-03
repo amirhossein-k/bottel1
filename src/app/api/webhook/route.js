@@ -9,53 +9,86 @@ const MESSAGES = {
 };
 
 async function handleUpdate(update) {
-  const msg = update.message;
-  if (!msg || !msg.text) return;
+  try {
+    console.log("[handleUpdate] started");
+    const msg = update.message;
+    if (!msg || !msg.text) return;
 
-  const chatId = String(msg.chat.id);
-  const text = msg.text.trim();
-  const firstName = msg.from?.first_name || "کاربر";
-  console.log(`📩 Received: "${text}" from ${chatId}`);
+    const chatId = String(msg.chat.id);
+    const text = msg.text.trim();
+    const firstName = msg.from?.first_name || "کاربر";
 
-  await connectDB();
+    console.log(`[handleUpdate] received: "${text}" from ${chatId}`);
 
-  if (text === "/start") {
-    return sendError(
-      chatId,
-      `${MESSAGES.welcome}\n\n👤 ${firstName} عزیز، منتظر کد سفارشتم!`,
-    );
+    console.log("[handleUpdate] connecting to DB...");
+    await connectDB();
+    console.log("[handleUpdate] DB connected");
+
+    if (text === "/start") {
+      console.log("[handleUpdate] sending welcome");
+      await sendError(
+        chatId,
+        `${MESSAGES.welcome}\n\n👤 ${firstName} عزیز، منتظر کد سفارشتم!`,
+      );
+      console.log("[handleUpdate] welcome sent");
+      return;
+    }
+
+    if (text === "/help") {
+      await sendError(chatId, MESSAGES.welcome);
+      return;
+    }
+
+    if (!/^\d+$/.test(text)) {
+      await sendError(chatId, MESSAGES.wrongFormat);
+      return;
+    }
+
+    console.log(`[handleUpdate] searching for orderId: ${text}`);
+    const order = await Order.findOne({ orderId: text });
+    if (!order) {
+      console.log("[handleUpdate] order not found");
+      await sendError(chatId, MESSAGES.notFound);
+      return;
+    }
+
+    console.log("[handleUpdate] order found, checking chatId");
+    if (!order.customer.chatId) {
+      order.customer.chatId = chatId;
+      await order.save();
+      console.log("[handleUpdate] chatId saved");
+    }
+
+    console.log("[handleUpdate] sending order details");
+    await replyToCustomer(chatId, order);
+    console.log("[handleUpdate] order details sent");
+  } catch (err) {
+    console.error("[handleUpdate] ERROR:", err.message);
+    console.error(err.stack);
   }
-
-  if (text === "/help") {
-    return sendError(chatId, MESSAGES.welcome);
-  }
-
-  if (!/^\d+$/.test(text)) {
-    return sendError(chatId, MESSAGES.wrongFormat);
-  }
-
-  const order = await Order.findOne({ orderId: text });
-
-  if (!order) {
-    return sendError(chatId, MESSAGES.notFound);
-  }
-
-  if (!order.customer.chatId) {
-    order.customer.chatId = chatId;
-    await order.save();
-  }
-
-  return replyToCustomer(chatId, order);
 }
 
 export async function POST(req) {
-  console.log("✅ Webhook called");
-  try {
-    const body = await req.json();
-    console.log("Body:", body);
-    return Response.json({ ok: true, received: true });
-  } catch (err) {
-    console.error("Error:", err);
-    return Response.json({ ok: false, error: err.message }, { status: 500 });
-  }
+  console.log("[POST] Webhook function started");
+
+  // Return immediate response
+  const immediateResponse = Response.json({ ok: true });
+
+  // Process asynchronously
+  (async () => {
+    try {
+      const update = await req.json();
+      console.log(
+        "[POST] Received update:",
+        JSON.stringify(update).slice(0, 200),
+      );
+      await handleUpdate(update);
+      console.log("[POST] Async processing completed");
+    } catch (err) {
+      console.error("[POST] Fatal error in async handler:", err.message);
+      console.error(err.stack);
+    }
+  })();
+
+  return immediateResponse;
 }
