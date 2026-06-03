@@ -1,0 +1,26 @@
+import mongoose from "mongoose";
+
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  throw new Error("MONGODB_URI در فایل .env تنظیم نشده");
+}
+
+// کش اتصال برای جلوگیری از اتصال مکرر در Next.js
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+export async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      dbName: "trackbot",
+    });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
