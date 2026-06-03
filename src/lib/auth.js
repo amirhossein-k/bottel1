@@ -10,7 +10,7 @@ export async function requireAuth(req) {
       { status: 401 },
     );
   }
-
+  //
   return null;
 }
 
