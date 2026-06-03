@@ -15,6 +15,7 @@ async function handleUpdate(update) {
   const chatId = String(msg.chat.id);
   const text = msg.text.trim();
   const firstName = msg.from?.first_name || "کاربر";
+  console.log(`📩 Received: "${text}" from ${chatId}`);
 
   await connectDB();
 
@@ -48,18 +49,13 @@ async function handleUpdate(update) {
 }
 
 export async function POST(req) {
-  // ابتدا یک پاسخ سریع 200 برمی‌گردانیم تا وب‌هوک قطع نشود
-  const immediateResponse = Response.json({ ok: true });
-
-  // سپس منطق اصلی را به صورت ناهمگام (async) و بدون `await` اجرا می‌کنیم
-  (async () => {
-    try {
-      const update = await req.json();
-      await handleUpdate(update);
-    } catch (err) {
-      console.error("Webhook async error:", err);
-    }
-  })();
-
-  return immediateResponse;
+  console.log("✅ Webhook called");
+  try {
+    const body = await req.json();
+    console.log("Body:", body);
+    return Response.json({ ok: true, received: true });
+  } catch (err) {
+    console.error("Error:", err);
+    return Response.json({ ok: false, error: err.message }, { status: 500 });
+  }
 }
