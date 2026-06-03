@@ -12,6 +12,44 @@ const EMPTY_FORM = {
   status: "pending",
 };
 
+// ✅ خارج از AddOrderModal تعریف شده — هیچ‌وقت remount نمی‌شه
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  required,
+  error,
+}) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label
+        style={{
+          fontSize: 13,
+          color: "#94A3B8",
+          display: "block",
+          marginBottom: 6,
+        }}
+      >
+        {label} {required && <span style={{ color: "#EF4444" }}>*</span>}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{ ...INPUT_STYLE, borderColor: error ? "#EF4444" : "#334155" }}
+      />
+      {error && (
+        <div style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>
+          ⚠️ {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AddOrderModal({ onSave, onClose }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
@@ -34,67 +72,110 @@ export default function AddOrderModal({ onSave, onClose }) {
 
   const handleSave = () => {
     const e = validate();
-    if (Object.keys(e).length > 0) { setErrors(e); return; }
+    if (Object.keys(e).length > 0) {
+      setErrors(e);
+      return;
+    }
 
     const today = new Date().toLocaleDateString("fa-IR");
-    const newOrder = {
+    onSave({
       ...form,
-      id: String(Date.now()).slice(-4), // موقتی — در واقع از API میاد
+      id: String(Date.now()).slice(-4),
       date: today,
       tracking: "",
-    };
-
-    onSave(newOrder);
+    });
     onClose();
   };
 
-  const Field = ({ label, fieldKey, placeholder, type = "text", required }) => (
-    <div style={{ marginBottom: 16 }}>
-      <label style={{ fontSize: 13, color: "#94A3B8", display: "block", marginBottom: 6 }}>
-        {label} {required && <span style={{ color: "#EF4444" }}>*</span>}
-      </label>
-      <input
-        type={type}
-        value={form[fieldKey]}
-        onChange={(e) => set(fieldKey, e.target.value)}
-        placeholder={placeholder}
-        style={{
-          ...INPUT_STYLE,
-          borderColor: errors[fieldKey] ? "#EF4444" : "#334155",
-        }}
-      />
-      {errors[fieldKey] && (
-        <div style={{ fontSize: 12, color: "#EF4444", marginTop: 4 }}>⚠️ {errors[fieldKey]}</div>
-      )}
-    </div>
-  );
-
   return (
     <div
-      style={{ position: "fixed", inset: 0, background: "#000000cc", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#000000cc",
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
       onClick={onClose}
     >
       <div
-        style={{ background: "#1E293B", borderRadius: 20, padding: 32, width: 520, maxHeight: "90vh", overflowY: "auto", border: "1px solid #334155", boxShadow: "0 32px 64px rgba(0,0,0,0.6)" }}
+        style={{
+          background: "#1E293B",
+          borderRadius: 20,
+          padding: 32,
+          width: 520,
+          maxHeight: "90vh",
+          overflowY: "auto",
+          border: "1px solid #334155",
+          boxShadow: "0 32px 64px rgba(0,0,0,0.6)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>➕ ثبت سفارش جدید</h3>
-        <p style={{ color: "#64748B", fontSize: 13, marginBottom: 24 }}>اطلاعات سفارش مشتری را وارد کنید</p>
+        <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>
+          ➕ ثبت سفارش جدید
+        </h3>
+        <p style={{ color: "#64748B", fontSize: 13, marginBottom: 24 }}>
+          اطلاعات سفارش مشتری را وارد کنید
+        </p>
 
         {/* ردیف اول */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="نام مشتری" fieldKey="customer" placeholder="مثال: علی رضایی" required />
-          <Field label="شماره تماس" fieldKey="phone" placeholder="09xxxxxxxxx" required />
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+        >
+          <Field
+            label="نام مشتری"
+            required
+            value={form.customer}
+            error={errors.customer}
+            onChange={(e) => set("customer", e.target.value)}
+            placeholder="مثال: علی رضایی"
+          />
+          <Field
+            label="شماره تماس"
+            required
+            value={form.phone}
+            error={errors.phone}
+            onChange={(e) => set("phone", e.target.value)}
+            placeholder="09xxxxxxxxx"
+          />
         </div>
 
         {/* محصول */}
-        <Field label="نام محصول" fieldKey="product" placeholder="مثال: کفش اسپرت سفید سایز ۴۲" required />
+        <Field
+          label="نام محصول"
+          required
+          value={form.product}
+          error={errors.product}
+          onChange={(e) => set("product", e.target.value)}
+          placeholder="مثال: کفش اسپرت سفید سایز ۴۲"
+        />
 
         {/* ردیف دوم */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="مبلغ (تومان)" fieldKey="amount" placeholder="مثال: 850000" type="number" required />
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+        >
+          <Field
+            label="مبلغ (تومان)"
+            type="number"
+            required
+            value={form.amount}
+            error={errors.amount}
+            onChange={(e) => set("amount", e.target.value)}
+            placeholder="مثال: 850000"
+          />
           <div style={{ marginBottom: 16 }}>
-            <label style={{ fontSize: 13, color: "#94A3B8", display: "block", marginBottom: 6 }}>وضعیت اولیه</label>
+            <label
+              style={{
+                fontSize: 13,
+                color: "#94A3B8",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
+              وضعیت اولیه
+            </label>
             <select
               value={form.status}
               onChange={(e) => set("status", e.target.value)}
@@ -109,7 +190,16 @@ export default function AddOrderModal({ onSave, onClose }) {
 
         {/* آدرس */}
         <div style={{ marginBottom: 24 }}>
-          <label style={{ fontSize: 13, color: "#94A3B8", display: "block", marginBottom: 6 }}>آدرس ارسال (اختیاری)</label>
+          <label
+            style={{
+              fontSize: 13,
+              color: "#94A3B8",
+              display: "block",
+              marginBottom: 6,
+            }}
+          >
+            آدرس ارسال (اختیاری)
+          </label>
           <textarea
             value={form.address}
             onChange={(e) => set("address", e.target.value)}
@@ -122,13 +212,35 @@ export default function AddOrderModal({ onSave, onClose }) {
         <div style={{ display: "flex", gap: 12 }}>
           <button
             onClick={handleSave}
-            style={{ flex: 1, background: "#10B981", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 800, fontSize: 15, cursor: "pointer", fontFamily: "inherit" }}
+            style={{
+              flex: 1,
+              background: "#10B981",
+              color: "#fff",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px",
+              fontWeight: 800,
+              fontSize: 15,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
           >
             ✅ ثبت سفارش
           </button>
           <button
             onClick={onClose}
-            style={{ flex: 1, background: "#334155", color: "#E2E8F0", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "inherit" }}
+            style={{
+              flex: 1,
+              background: "#334155",
+              color: "#E2E8F0",
+              border: "none",
+              borderRadius: 10,
+              padding: "12px",
+              fontWeight: 700,
+              fontSize: 15,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
           >
             انصراف
           </button>
