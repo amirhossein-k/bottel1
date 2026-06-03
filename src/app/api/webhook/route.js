@@ -48,20 +48,18 @@ async function handleUpdate(update) {
 }
 
 export async function POST(req) {
-  export async function POST(req) {
-    // ابتدا یک پاسخ سریع 200 برمی‌گردانیم تا وب‌هوک قطع نشود
-    const immediateResponse = Response.json({ ok: true });
+  // ابتدا یک پاسخ سریع 200 برمی‌گردانیم تا وب‌هوک قطع نشود
+  const immediateResponse = Response.json({ ok: true });
 
-    // سپس منطق اصلی را به صورت ناهمگام (async) و بدون `await` اجرا می‌کنیم
-    (async () => {
-      try {
-        const update = await req.json();
-        await handleUpdate(update);
-      } catch (err) {
-        console.error("Webhook async error:", err);
-      }
-    })();
+  // سپس منطق اصلی را به صورت ناهمگام (async) و بدون `await` اجرا می‌کنیم
+  (async () => {
+    try {
+      const update = await req.json();
+      await handleUpdate(update);
+    } catch (err) {
+      console.error("Webhook async error:", err);
+    }
+  })();
 
-    return immediateResponse;
-  }
+  return immediateResponse;
 }
