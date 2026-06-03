@@ -1,9 +1,11 @@
 // src\app\telegram\bot.ts
 import { Telegraf } from "telegraf";
 import { startHandler } from "./handlers/start";
+import { handleMessage } from "./handlers/message";
 const bot = new Telegraf(process.env.BOT_TOKEN!);
 bot.start(startHandler()); // اینجا هندلر استارت جدید
 
+bot.on("text", handleMessage);
 
 export async function POST(req: Request) {
        try {
