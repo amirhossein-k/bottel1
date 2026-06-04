@@ -90,7 +90,9 @@ export default function AdminPage() {
 
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <main style={{ marginRight: 220, padding: 32 }}>
+      <main
+      //  style={{ marginRight: 220, padding: 32 }}
+      >
         {activeTab === "orders" && (
           <>
             {isError && (
