@@ -15,6 +15,7 @@ import AnalyticsTab from "./components/AnalyticsTab";
 import BroadcastTab from "./components/BroadcastTab";
 import SettingsTab from "./components/SettingsTab";
 import Toast from "./components/Toast";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 function toUIOrder(doc) {
   return {
@@ -46,6 +47,7 @@ export default function AdminPage() {
     createOrder,
     updateOrder,
   } = useOrders({ status: filters.status, search: filters.search });
+  const isMobile = useIsMobile();
 
   const orders = rawOrders.map(toUIOrder);
 
@@ -91,7 +93,7 @@ export default function AdminPage() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main
-      //  style={{ marginRight: 220, padding: 32 }}
+        style={{ marginRight: isMobile ? 220 : 0, padding: isMobile ? 32 : 0 }}
       >
         {activeTab === "orders" && (
           <>
