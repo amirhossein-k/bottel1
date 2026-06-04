@@ -93,7 +93,10 @@ export default function AdminPage() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <main
-        style={{ marginRight: isMobile ? 220 : 0, padding: isMobile ? 32 : 0 }}
+        style={{
+          marginRight: !isMobile ? 220 : 0,
+          padding: !isMobile ? 32 : 0,
+        }}
       >
         {activeTab === "orders" && (
           <>
