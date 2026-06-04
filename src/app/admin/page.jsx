@@ -54,9 +54,13 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const handleAddSave = (mongoDoc) => {
-    showToast(`سفارش #${mongoDoc.orderId} ثبت شد ✅`);
-  };
+  const handleAddSave = (formData) => {
+ try {
+      const mongoDoc = await createOrder(formData);
+      showToast(`سفارش #${mongoDoc.orderId} ثبت شد ✅`);
+    } catch (err) {
+      showToast(err.message || "خطا در ثبت سفارش", "error");
+    }  };
 
   const handleEditSave = async (orderId, data) => {
     try {
