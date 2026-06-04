@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@telegraf/session": "^2.0.0-beta.7",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "mongoose": "^9.6.3",

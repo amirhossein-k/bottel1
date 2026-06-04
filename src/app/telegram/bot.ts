@@ -1,11 +1,18 @@
 // src\app\telegram\bot.ts
 import { Telegraf } from "telegraf";
+import session from "telegraf/session";
+
 import { startHandler } from "./handlers/start";
-import { handleMessage } from "./handlers/message";
+import { handleMessage, handleReplyButton } from "./handlers/message";
 const bot = new Telegraf(process.env.BOT_TOKEN!);
+// اضافه کردن middleware session
+// cast to any to satisfy TypeScript typings for the imported session module
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+bot.use((session as any)());
 bot.start(startHandler()); // اینجا هندلر استارت جدید
 
 bot.on("text", handleMessage);
+bot.action(/reply_to_(.+)/, handleReplyButton); // اضافه کردن هندلر جدید برای دکمه Reply
 
 export async function POST(req: Request) {
        try {
