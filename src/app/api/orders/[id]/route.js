@@ -5,7 +5,8 @@ import { notifyCustomer } from "@/lib/bot";
 export async function GET(req, { params }) {
   try {
     await connectDB();
-    const order = await Order.findOne({ orderId: params.id });
+    const { id } = await params;
+    const order = await Order.findOne({ orderId: id });
     if (!order)
       return Response.json(
         { success: false, error: "سفارش پیدا نشد" },
@@ -23,9 +24,11 @@ export async function GET(req, { params }) {
 export async function PATCH(req, { params }) {
   try {
     await connectDB();
+    const { id } = await params;
+
     const body = await req.json();
 
-    const order = await Order.findOne({ orderId: params.id });
+    const order = await Order.findOne({ orderId: id });
     if (!order)
       return Response.json(
         { success: false, error: "سفارش پیدا نشد" },
@@ -64,7 +67,8 @@ export async function PATCH(req, { params }) {
 export async function DELETE(req, { params }) {
   try {
     await connectDB();
-    await Order.findOneAndDelete({ orderId: params.id });
+    const { id } = await params;
+    await Order.findOneAndDelete({ orderId: id });
     return Response.json({ success: true, message: "سفارش حذف شد" });
   } catch (err) {
     return Response.json(

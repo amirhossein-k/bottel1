@@ -12,6 +12,8 @@ export async function connectDB() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
+      dbName: "trackbot", // ✅ همیشه به دیتابیس درست وصل می‌شود
+
       bufferCommands: false, // مهم: بافر را غیرفعال می‌کند تا فوراً خطا بدهد
     });
   }
