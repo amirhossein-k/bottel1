@@ -279,7 +279,7 @@ export default function AnalyticsTab() {
             />
             <Bar
               dataKey="allRevenue"
-              name="allRevenue"
+              name="کل سفارش ها"
               fill="#38BDF844"
               stroke="#38BDF8"
               strokeWidth={1}
@@ -287,7 +287,7 @@ export default function AnalyticsTab() {
             />
             <Bar
               dataKey="revenue"
-              name="revenue"
+              name="تحویل شده"
               fill="#10B981"
               radius={[4, 4, 0, 0]}
             />
