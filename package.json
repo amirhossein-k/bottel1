@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.15.11",
     "@telegraf/session": "^2.0.0-beta.7",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
