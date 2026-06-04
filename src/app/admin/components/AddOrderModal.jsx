@@ -78,24 +78,23 @@ export default function AddOrderModal({ onSave, onClose }) {
     return e;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const e = validate();
     if (Object.keys(e).length > 0) {
       setErrors(e);
       return;
     }
     setLoading(true);
-try {
-
-  const today = new Date().toLocaleDateString("fa-IR");
-await  onSave({
-    ...form,
-    id: String(Date.now()).slice(-4),
-    date: today,
-    tracking: "",
-  });
-  // onClose();
-}finally {
+    try {
+      const today = new Date().toLocaleDateString("fa-IR");
+      await onSave({
+        ...form,
+        id: String(Date.now()).slice(-4),
+        date: today,
+        tracking: "",
+      });
+      // onClose();
+    } finally {
       setLoading(false);
     }
   };
@@ -144,8 +143,7 @@ await  onSave({
             error={errors.customer}
             onChange={(e) => set("customer", e.target.value)}
             placeholder="مثال: علی رضایی"
-                        disabled={loading}
-
+            disabled={loading}
           />
           <Field
             label="شماره تماس"
@@ -154,8 +152,7 @@ await  onSave({
             error={errors.phone}
             onChange={(e) => set("phone", e.target.value)}
             placeholder="09xxxxxxxxx"
-                        disabled={loading}
-
+            disabled={loading}
           />
         </div>
 
@@ -167,8 +164,7 @@ await  onSave({
           error={errors.product}
           onChange={(e) => set("product", e.target.value)}
           placeholder="مثال: کفش اسپرت سفید سایز ۴۲"
-                      disabled={loading}
-
+          disabled={loading}
         />
 
         {/* ردیف دوم */}
@@ -183,8 +179,7 @@ await  onSave({
             error={errors.amount}
             onChange={(e) => set("amount", e.target.value)}
             placeholder="مثال: 850000"
-                        disabled={loading}
-
+            disabled={loading}
           />
           <div style={{ marginBottom: 16 }}>
             <label
@@ -200,12 +195,13 @@ await  onSave({
             <select
               value={form.status}
               onChange={(e) => set("status", e.target.value)}
- style={{
+              style={{
                 ...INPUT_STYLE,
                 padding: "10px 16px",
                 opacity: loading ? 0.6 : 1,
                 cursor: loading ? "not-allowed" : "pointer",
-              }}              disabled={loading}
+              }}
+              disabled={loading}
             >
               <option value="pending">⏳ در انتظار تایید</option>
               <option value="confirmed">✅ تایید شده</option>
@@ -231,21 +227,21 @@ await  onSave({
             onChange={(e) => set("address", e.target.value)}
             placeholder="شهر، خیابان، پلاک..."
             rows={2}
-disabled={loading}
+            disabled={loading}
             style={{
               ...INPUT_STYLE,
               resize: "vertical",
               opacity: loading ? 0.6 : 1,
               cursor: loading ? "not-allowed" : "text",
-            }}          />
+            }}
+          />
         </div>
 
         <div style={{ display: "flex", gap: 12 }}>
           <button
             onClick={handleSave}
-                        disabled={loading}
-
-           style={{
+            disabled={loading}
+            style={{
               flex: 1,
               background: loading ? "#0D9268" : "#10B981",
               color: "#fff",
@@ -263,7 +259,7 @@ disabled={loading}
               transition: "background 0.2s",
             }}
           >
-               {loading ? (
+            {loading ? (
               <>
                 <span
                   style={{
@@ -284,9 +280,8 @@ disabled={loading}
           </button>
           <button
             onClick={onClose}
-                        disabled={loading}
-
-             style={{
+            disabled={loading}
+            style={{
               flex: 1,
               background: "#334155",
               color: "#E2E8F0",
