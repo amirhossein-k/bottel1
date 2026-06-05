@@ -42,7 +42,7 @@ export async function POST(req) {
         { status: 500 },
       );
     }
-
+    //
     // اگر مشتری قبلاً chatId دارد، مستقیم پیام می‌فرستیم
     if (order.customer.chatId) {
       await notifyCustomer(order);
