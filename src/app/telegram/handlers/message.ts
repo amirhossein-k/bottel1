@@ -137,8 +137,35 @@ export async function handleMessage(ctx: Context & { session?: MySession }) {
               }
 
               // ── بقیه دستورات عادی ─────────────────────────────
-              if (text === "/start") {
-                     await sendError(chatId, `${MESSAGES.welcome}\n\n👤 ${firstName} عزیز، منتظر کد سفارشتم!`);
+              if (text.startsWith("/start")) {
+                     // بررسی deep-link: /start 1001
+                     const parts = text.split(" ");
+                     const startParam = parts[1]?.trim();
+
+                     if (startParam && /^\d+$/.test(startParam)) {
+                            // مشتری از لینک دعوت آمده — کد سفارش داریم
+                            const linkedOrder = await Order.findOne({ orderId: startParam });
+                            if (linkedOrder) {
+                                   if (!linkedOrder.customer.chatId) {
+                                          linkedOrder.customer.chatId = chatId;
+                                          await linkedOrder.save();
+                                   }
+                                   await sendError(chatId,
+                                          `👋 ${firstName} عزیز، متصل شدید!\n\n` +
+                                          `✅ شماره شما با سفارش <b>#${startParam}</b> مرتبط شد.\n` +
+                                          `از این پس وضعیت سفارشتان را اینجا دریافت می‌کنید.\n\n` +
+                                          `📦 برای مشاهده وضعیت فعلی، همین کد را ارسال کنید: <code>${startParam}</code>`
+                                   );
+                            } else {
+                                   await sendError(chatId,
+                                          `⚠️ ${firstName} عزیز، لینک معتبر است اما سفارش #${startParam} پیدا نشد.\n\n` +
+                                          `📦 کد سفارش درست را ارسال کنید.`
+                                   );
+                            }
+                     } else {
+                            // /start بدون پارامتر — خوش‌آمدگویی عادی
+                            await sendError(chatId, `${MESSAGES.welcome}\n\n👤 ${firstName} عزیز، منتظر کد سفارشتم!`);
+                     }
                      return;
               }
 

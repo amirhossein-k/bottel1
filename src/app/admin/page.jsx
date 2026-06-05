@@ -31,6 +31,8 @@ function toUIOrder(doc) {
     date: doc.createdAt
       ? new Date(doc.createdAt).toLocaleDateString("fa-IR")
       : "",
+
+    chatId: doc.customer?.chatId || null,
     _raw: doc,
   };
 }
@@ -59,6 +61,29 @@ export default function AdminPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
+  const handleInvite = async (uiOrder) => {
+    try {
+      const res = await fetch("/api/orders/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: uiOrder.id }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        showToast(data.error || "خطا در دریافت لینک", "error");
+        return;
+      }
+      if (data.alreadyConnected) {
+        showToast("✅ مشتری قبلاً متصل بود — پیام وضعیت ارسال شد");
+      } else {
+        // کپی لینک در clipboard
+        await navigator.clipboard.writeText(data.inviteLink).catch(() => {});
+        showToast(`🔗 لینک کپی شد — برای ${uiOrder.customer} ارسال کنید`);
+      }
+    } catch {
+      showToast("خطا در اتصال به سرور", "error");
+    }
+  };
   const handleAddSave = async (formData) => {
     try {
       const mongoDoc = await createOrder(formData);
@@ -134,13 +159,14 @@ export default function AdminPage() {
               onFiltersChange={setFilters}
               onEdit={(o) => setEditingOrder(o._raw || o)}
               onAddNew={() => setShowAddModal(true)}
+              onInvite={handleInvite}
             />
           </>
         )}
 
         {activeTab === "analytics" && <AnalyticsTab />}
         {activeTab === "broadcast" && <BroadcastTab onToast={showToast} />}
-        {activeTab === "settings" && <SettingsTab onToast={showToast} />}
+        {/* {activeTab === "settings" && <SettingsTab onToast={showToast} />} */}
       </main>
 
       {editingOrder && (

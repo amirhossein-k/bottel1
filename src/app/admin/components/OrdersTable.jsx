@@ -146,6 +146,7 @@ export default function OrdersTable({
   onFiltersChange,
   onEdit,
   onAddNew,
+  onInvite,
 }) {
   const isMobile = useIsMobile();
 
@@ -367,22 +368,53 @@ export default function OrdersTable({
                         {order.date}
                       </td>
                       <td style={{ padding: "14px 16px" }}>
-                        <button
-                          onClick={() => onEdit(order)}
-                          style={{
-                            background: "#38BDF822",
-                            color: "#38BDF8",
-                            border: "1px solid #38BDF844",
-                            borderRadius: 8,
-                            padding: "6px 14px",
-                            cursor: "pointer",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            fontFamily: "inherit",
-                          }}
-                        >
-                          ویرایش
-                        </button>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <button
+                            onClick={() => onEdit(order)}
+                            style={{
+                              background: "#38BDF822",
+                              color: "#38BDF8",
+                              border: "1px solid #38BDF844",
+                              borderRadius: 8,
+                              padding: "6px 14px",
+                              cursor: "pointer",
+                              fontSize: 13,
+                              fontWeight: 600,
+                              fontFamily: "inherit",
+                            }}
+                          >
+                            ویرایش
+                          </button>
+                          {!order.chatId && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onInvite(order);
+                              }}
+                              title="ارسال لینک دعوت به ربات"
+                              style={{
+                                background: "#F59E0B22",
+                                color: "#F59E0B",
+                                border: "1px solid #F59E0B44",
+                                borderRadius: 8,
+                                padding: "6px 10px",
+                                cursor: "pointer",
+                                fontSize: 13,
+                                fontFamily: "inherit",
+                              }}
+                            >
+                              🔗
+                            </button>
+                          )}
+                          {order.chatId && (
+                            <span
+                              title="ربات متصل است"
+                              style={{ fontSize: 16, padding: "6px 4px" }}
+                            >
+                              ✅
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
