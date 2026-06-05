@@ -46,14 +46,54 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     await connectDB();
-    const body = await req.json();
 
+    // ── بررسی محدودیت پلن ────────────────────────────────────
+    const session = await getSession();
+    if (session) {
+      const admin = await Admin.findOne({ username: session.user.username });
+      if (admin && admin.role !== "superadmin") {
+        if (!admin.hasActiveService()) {
+          return Response.json(
+            {
+              success: false,
+              error: "service_expired",
+              message:
+                "سقف سفارش‌های پلن شما تمام شده. لطفاً سرویس را تمدید کنید.",
+            },
+            { status: 403 },
+          );
+        }
+        // مصرف یک سفارش از سهمیه
+        await admin.consumeOrder();
+      }
+    }
+    // ────────────────────────────────────────────────────────
+
+    const body = await req.json();
     const count = await Order.countDocuments();
     const orderId = String(1000 + count + 1);
 
     const order = await Order.create({
       orderId,
-      ...body,
+      customer: {
+        name: body.customer || "",
+        phone: body.phone || "",
+        chatId: body.chatId || "",
+      },
+      items: [
+        {
+          name: body.product || "",
+          quantity: 1,
+          price: Number(body.amount) || 0,
+        },
+      ],
+      totalAmount: Number(body.amount) || 0,
+      address: {
+        city: "",
+        detail: body.address || "",
+        postalCode: "",
+      },
+      status: body.status || "pending",
       statusHistory: [{ status: body.status || "pending" }],
     });
 

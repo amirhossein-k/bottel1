@@ -19,7 +19,13 @@ const fetcher = (url) =>
  * @param {number} params.page    - شماره صفحه (پیش‌فرض ۱)
  * @param {number} params.limit   - تعداد در هر صفحه (پیش‌فرض ۲۰)
  */
-export function useOrders({ status = "all", search = "", page = 1, limit = 20 } = {}) {
+
+export function useOrders({
+  status = "all",
+  search = "",
+  page = 1,
+  limit = 20,
+} = {}) {
   const params = new URLSearchParams();
   if (status && status !== "all") params.set("status", status);
   if (search.trim()) params.set("search", search.trim());
@@ -39,23 +45,22 @@ export function useOrders({ status = "all", search = "", page = 1, limit = 20 } 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        customer: {
-          name: body.customer,
-          phone: body.phone,
-        },
-        items: [{ name: body.product, qty: 1, price: Number(body.amount) }],
-        totalAmount: Number(body.amount),
+        customer: body.customer,
+        phone: body.phone,
+        product: body.product,
+        amount: Number(body.amount),
+        address: body.address || "",
         status: body.status || "pending",
-        shipping: {
-          address: body.address || "",
-          trackingCode: "",
-        },
       }),
     });
 
     const json = await res.json();
-    if (!json.success) throw new Error(json.error);
-
+    // ✅ خطای سقف سفارش — با code مخصوص throw می‌شود
+    if (!json.success) {
+      const err = new Error(json.message || json.error || "خطا در ثبت سفارش");
+      err.code = json.error; // "service_expired"
+      throw err;
+    }
     await mutate(); // رفرش لیست
     return json.data;
   };

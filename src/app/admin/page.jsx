@@ -16,6 +16,8 @@ import BroadcastTab from "./components/BroadcastTab";
 import SettingsTab from "./components/SettingsTab";
 import Toast from "./components/Toast";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import PlanBanner from "./components/PlanBanner";
+import RenewModal from "./components/RenewModal";
 
 function toUIOrder(doc) {
   return {
@@ -37,6 +39,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("orders");
   const [editingOrder, setEditingOrder] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showRenew, setShowRenew] = useState(false);
   const [toast, setToast] = useState(null);
   const [filters, setFilters] = useState({ status: "all", search: "" });
 
@@ -61,6 +64,12 @@ export default function AdminPage() {
       const mongoDoc = await createOrder(formData);
       showToast(`سفارش #${mongoDoc.orderId} ثبت شد ✅`);
     } catch (err) {
+      // ── اگر سقف تمام شده باشد، مودال تمدید نشان بده ──────
+      if (err.code === "service_expired" || err.message?.includes("تمدید")) {
+        setShowAddModal(false);
+        setShowRenew(true);
+        return;
+      }
       showToast(err.message || "خطا در ثبت سفارش", "error");
     }
   };
@@ -100,6 +109,8 @@ export default function AdminPage() {
       >
         {activeTab === "orders" && (
           <>
+            {/* ✅ نوار وضعیت پلن — همیشه نمایش داده می‌شود */}
+            <PlanBanner />
             {isError && (
               <div
                 style={{
@@ -146,7 +157,17 @@ export default function AdminPage() {
           onClose={() => setShowAddModal(false)}
         />
       )}
-
+      {/* ✅ مودال تمدید — وقتی سقف تمام شده باز می‌شود */}
+      {showRenew && (
+        <RenewModal
+          currentPlan={null}
+          onClose={() => setShowRenew(false)}
+          onSuccess={() => {
+            setShowRenew(false);
+            showToast("درخواست تمدید ثبت شد ✅");
+          }}
+        />
+      )}
       <style>{`
         @keyframes slideDown {
           from { opacity:0; transform: translateX(-50%) translateY(-20px); }
