@@ -295,7 +295,7 @@ export default function AnalyticsTab() {
         </ResponsiveContainer>
       </ChartCard>
 
-      {/* ── جدول ماه به ماه با اسکرول افقی ── */}
+      {/* ── جدول ماه به ماfffه با اسکرول افقی ── */}
       <ChartCard title="📋 جزئیات ماه به ماه" isMobile={isMobile}>
         <div style={{ overflowX: "auto" }}>
           <table
