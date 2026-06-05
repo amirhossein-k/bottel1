@@ -183,7 +183,7 @@ export default function AdminPage() {
           onClose={() => setShowAddModal(false)}
         />
       )}
-      {/* ✅ مودال تمدید — وقتی سقف تمام شده باز می‌شود */}
+      {/* ✅ مودال تمدید قق— وقتی سقف تمام شده باز می‌شود */}
       {showRenew && (
         <RenewModal
           currentPlan={null}
